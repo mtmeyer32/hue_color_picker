@@ -1,0 +1,75 @@
+<script src="jscolor.js"></script>
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+</style>
+
+<p>'onchange' fires after the mouse button is released</p>
+
+<p>Rectangle color:
+<input class="jscolor" onchange="update(this.jscolor)" value="cc66ff">
+
+<p id="rect" style="border:1px solid gray; width:161px; height:100px;"></p>
+
+<table id="colorTable">
+  <tr>
+    <th>HEX</th>
+    <th>RGB</th>
+    <th>Hue (°)</th>
+    <th>Sat</th>
+    <th>Bri</th>
+    <th>xy</th>
+  </tr>
+  <tr>
+    <td id="hex"></td>
+    <td id="rgb"></td>
+    <td id="hue"></td>
+    <td id="sat"></td>
+    <td id="bri"></td>
+    <td id="xy"></td>
+  </tr>
+</table>
+
+<script>
+function update(color) {
+    document.getElementById('rect').style.backgroundColor = '#' + color;
+    var r = Math.round( color.rgb[0]);
+    var g = Math.round( color.rgb[1]);
+    var b = Math.round( color.rgb[2]);
+    var h = Math.round( color.hsv[0]);
+    var s = Math.round( color.hsv[1]);
+    var v = Math.round( color.hsv[2]);
+    var xy = toXY(r, g, b);
+    document.getElementById('hex').innerHTML = color.toHEXString();
+    document.getElementById('rgb').innerHTML = "( " + r + ", " + g + ", " + b + " )";
+    document.getElementById('hue').innerHTML = h;
+    document.getElementById('sat').innerHTML = s;
+    document.getElementById('bri').innerHTML = v;
+    document.getElementById('xy').innerHTML = xy;
+}
+
+function toXY(red,green,blue){
+    //Gamma correctie
+    red = (red > 0.04045) ? Math.pow((red + 0.055) / (1.0 + 0.055), 2.4) : (red / 12.92);
+    green = (green > 0.04045) ? Math.pow((green + 0.055) / (1.0 + 0.055), 2.4) : (green / 12.92);
+    blue = (blue > 0.04045) ? Math.pow((blue + 0.055) / (1.0 + 0.055), 2.4) : (blue / 12.92);
+    
+    //Apply wide gamut conversion D65
+    var X = red * 0.664511 + green * 0.154324 + blue * 0.162028;
+    var Y = red * 0.283881 + green * 0.668433 + blue * 0.047685;
+    var Z = red * 0.000088 + green * 0.072310 + blue * 0.986039;
+    
+    var fx = X / (X + Y + Z);
+    var fy = Y / (X + Y + Z);
+    
+    return [fx.toPrecision(4),fy.toPrecision(4)];
+}
+
+
+</script>
